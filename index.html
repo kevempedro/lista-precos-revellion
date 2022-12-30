@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-main>
+        <v-container class="d-flex flex-column align-center">
+            <h1 class="text-center mt-10 mb-10">Réveillon 2023</h1>
+
+            <div class="d-flex flex-column align-center pa-2"
+                style="box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important; width: max-content; border-radius: 3px;"
+            >
+                <div id="year" class="year"></div>
+
+                <div id="countdown" class="d-flex justify-between">
+                    <div class="time text-center px-4">
+                      <h2 id="days">00</h2>
+                      <small>dia(s)</small>
+                    </div>
+
+                    <div class="time text-center px-4">
+                      <h2 id="hours">00</h2>
+                      <small>hora(s)</small>
+                    </div>
+
+                    <div class="time text-center px-4">
+                      <h2 id="minutes">00</h2>
+                      <small>minuto(s)</small>
+                    </div>
+
+                    <div class="time text-center px-4">
+                      <h2 id="seconds">00</h2>
+                      <small>segundo(s)</small>
+                    </div>
+                  </div>
+            </div>
+
+            <h1 class="text-center mt-15 mb-10">Quem vai beber e comer o que</h1>
+
+            <v-row>
+                <v-col cols="12">
+                    <div class="container-total pa-2">
+                        <p class="text-center">Total da farra: R$541,60</p>
+                    </div>
+                </v-col>
+                <v-col v-for="item in items" :key="item.name" cols="12" sm="12" md="6">
+                    <div class="content-item d-flex flex-column align-center justify-end pa-1">
+                        <img class="item-image" :src="item.itemImage" />
+
+                        <h2 class="mt-1 text-center">{{ item.itemName }}</h2>
+
+                        <h3 class="mt-5 text-center">{{ item.people.length }} pessoas - valor por pessoa R${{ (item.itemPrice / item.people.length).toFixed(2).replace('.', ',') }}</h3>
+
+                        <div class="content-person d-flex mt-2">
+                            <div class="d-flex flex-column justify-center align-center ma-2" v-for="person in item.people" :key="person.name">
+                                <img class="person-image" :src="person.image" />
+
+                                <p class="person-name mt-1">{{ person.name }}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </v-col>
+            </v-row>
+
+            <h1 class="text-center mt-15 mb-10">Divisão dos preços</h1>
+
+             <v-data-table
+                style="width: inherit; box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;"
+                :options="{ itemsPerPage: purchases.length }"
+                :headers="headers"
+                :items="purchases"
+                item-key="name"
+                group-by="person"
+                class="elevation-1"
+                show-group-by
+            />
+        </v-container>
+      </v-main>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+
+
+      data () {
+        return {
+            items: [
+            {
+                    itemName: 'Gelo - R$22,40',
+                    itemImage: 'https://www.setegotas.com.br/wp-content/uploads/2021/03/gelo-3kg.jpg',
+                    itemPrice: 22.40,
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Whisky jack Daniels 1L - R$145,90',
+                    itemPrice: 145.90,
+                    itemImage: 'https://http2.mlstatic.com/D_NQ_NP_703616-MLA44936252729_022021-O.jpg',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Vodka Smirnoff 1L - R$36,90',
+                    itemPrice: 36.90,
+                    itemImage: 'https://a-static.mlcdn.com.br/1500x1500/vodka-smirnoff-red-original-998ml/magazineluiza/225379200/d4d27f8ed844c9b0121bd9cc73fd9829.jpg',
+                    people: [
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Energético Vulcano 1.5L - R$51,00',
+                    itemPrice: 51.00,
+                    itemImage: 'https://ibassets.com.br/ib.item.image.big/b-23c5271a685b4b4eb521a573b555af2b.jpeg',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Água sem gás Cristal 500ml - R$1,96',
+                    itemPrice: 1.96,
+                    itemImage: 'https://supernossoio.vtexassets.com/arquivos/ids/183094/Agua-Mineral-Crystal-Sem-Gas-500-ml.jpg?v=637776877277130000',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Água com gás Cristal 500ml - R$4,16',
+                    itemPrice: 4.16,
+                    itemImage: 'https://static.clubeextra.com.br/img/uploads/1/972/12051972.jpg',
+                    people: [
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Cerveja Brahma 1 caixa - R$143,28',
+                    itemPrice: 143.28,
+                    itemImage: 'https://www.paodeacucar.com/img/uploads/1/492/693492.jpg',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Suco de uva Vale 1L - R$14,96',
+                    itemPrice: 14.96,
+                    itemImage: 'https://hiperideal.vteximg.com.br/arquivos/ids/193472-1000-1000/1446894.jpg?v=637679376663430000',
+                    people: [
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Suco de laranja Maguary 1L - R$4,98',
+                    itemPrice: 4.98,
+                    itemImage: 'https://imgs.extra.com.br/1515118230/1xg.jpg',
+                    people: [
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Águas de coco congelada - R$29,00',
+                    itemPrice: 29.00,
+                    itemImage: 'https://santaluzia.vteximg.com.br/arquivos/ids/968078/974641.jpg?v=637385240305100000',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Coca-Cola e Sprite 2L - R$13,48',
+                    itemPrice: 13.48,
+                    itemImage: 'https://us-southeast-1.linodeobjects.com/storage/comercial-paranaense/media/uploads/produto/kit_cocacola_2l_sprite_2l_5e7c6e48-4748-4830-980a-ead833e843e3.png',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Azeitona - R$12,68',
+                    itemPrice: 12.68,
+                    itemImage: 'https://cdn.lavioletera.com.br/346-large_default/azeitona-verde-com-caroco-la-violetera-500g.jpg',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Amendoim Pachazitos - R$28,96',
+                    itemPrice: 28.96,
+                    itemImage: 'data:image/jpeg;base64,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',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                },
+                {
+                    itemName: 'Salame Aurora - R$31,94',
+                    itemPrice: 31.94,
+                    itemImage: 'https://www.auroraalimentos.com.br/wp-content/uploads/2022/04/SALAME-FATIADO-AURORA-100G-620-2-1-1-1-1.png',
+                    people: [
+                        {
+                            name: 'Kevem Lima',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312206265_989102211921931_4874814461214705683_n.jpg?ccb=11-4&oh=01_AdSSDRaL0HLVUUlNrj_w48bDjupNRmRdAmNm2GSdkAKDtA&oe=63BBFE8A',
+                        },
+                        {
+                            name: 'Hudson Artur',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAADMDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAABQYABwIDBAEI/8QANRAAAQMDAwEFBQYHAAAAAAAAAQIDBAAFERIhMQYTQVFhkRQicYGxFSMyQlKhM2KiwcLR4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFAQb/xAAgEQEAAgEFAQADAAAAAAAAAAABAAIDBBESITFhQVHB/9oADAMBAAIRAxEAPwBV6OvVzg29TUOWttKlkLGAc+o8DR77UuDzhW5KWVnk4G/7UodPq0h9OeHM+o/5TEysCsHU2uXQZ6LSUx2oKEJonTSN5K/lijdqC5EIrdUpagsjJ+ApP7K/yJJNpiMSGkcsasOLHeQTt8BTv0j2Um2kuIeSC4T+kj3U7EEZotPjylxs9P2Bq8mFxJQ2T5MY6Al0nv8AGmuwjLDh8xQr2aGlRIQ8T5uAf40ZsoSGF6EFKdXBXq/sK1sVEmLewzvxUrLFSnxU+XbO92cl8Z2UAfTP+6PW+a1IlCOw6FOcnSc6RkDOfmKTHllJc0n8ScH1FdNsbuDD6JMNqSkkEJcQ0SNxgd2CMkVQvpjI7y/TVOMKkfpkByS5HcUhbGsqaGjtUK/Lg6kAjbfkEYztxThZ1N2qNplSBh5ZW2pZ3WNIznzyDn5eNU7Nul8UEOyXH1dkBhxyOkhBzyMpwnc42xnAp86JvjfVUJ223KMkuR/e1NqwSCCCU+GRkY8cGiMXBry8IDl51sV9f5HD29h5agy6lRTzjuphsIS7BK1E/wAQ8KIpMQhtua+WkFKFHbPOKc7AofZaMDG5z5mrgB5KQr7PH3Al1QBOx/UalCLlJKJrqQeCPpUpTk7jSs+fITQenJSpIWACopPeAKziXefBK0RJbraeAnOoAeQOcfKvLO5ovEYk7FWn1GK4s/eLJ23qVdrTqbk7Zt0nzQr2mW6sEYKQrSk/FIwDVj9LpEZhL7ASlptQDgAwcFP4v2qrM84q1uiHSqLJQo5CFJ0jAwAc7UrOFkH7GYbNa2Q/UY33QvS4k80z2BebUk+KjSi/pACQAE4xgcU12HAtDek5BKvrT8e4dyvZGykCXEByc8r+bHptUpC6s6tvFu6inRIrEMstuYSXAoqOQCc4PiTUpLiuu+0bzqfmV8z91LSvUlJQdQKjgZG4rWpsLVqSrdR4PnW+4LXHnu6RpIyCCONsGuq0WK6XGTGjswpaUPuIR2/syyhAUQNRIHAzmmh3BU4k0RYDjqk6loQk953PpVgdEq7Mz2RkhJQAfhqFApXSd7h32XGt9mnyIqHT2LqI6yhSOU+9jB2wM57qaulrDeYKp8ifbZEdpegguADjVn60OSq7MlbdJCi1EqAKCBTf0+Qm0MZ2yVH+o0pPcUw2t4ptTAB/KfqaKj1AfYWesljkuKekW2C66vdS3GUqUfiSKlAnJaws+8alM5wdif/Z',
+                        },
+                        {
+                            name: 'Izza Dias',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317014112_1079495103448708_5555497626631427309_n.jpg?ccb=11-4&oh=01_AdQ_CJaM5rEmgTf2aHfC6xJaJIIYofVo8X-rDEn-dhTBJQ&oe=63BBFBFB',
+                        },
+                        {
+                            name: 'Caio Ribeiro',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/315788520_905609010809769_3868678952671275905_n.jpg?ccb=11-4&oh=01_AdQw5agsSk85TsUJck_IOBLk_Xi7ZhctwHy1-8Tn-fV_2A&oe=63BBCF8C',
+                        },
+                        {
+                            name: 'Lucas Vinicius',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/317645639_1600919263672470_7406440682138104100_n.jpg?ccb=11-4&oh=01_AdTkvFd2lu1JaHkJeHs7eqHb-gGgGxrTR_NONIbnAq9myw&oe=63BBF11B',
+                        },
+                        {
+                            name: 'Yusef Jose',
+                            image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCABAAEADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAABAUDBgcBAv/EADAQAAIBAwIFAwIEBwAAAAAAAAECAwAEERIhBRMxQVEiYXEGkRRCsdEyY4GSofDx/8QAGgEAAgMBAQAAAAAAAAAAAAAAAgUBAwQGAP/EACURAAICAgIBAgcAAAAAAAAAAAECABEDIQQSMSJRExRBYXGh8P/aAAwDAQACEQMRAD8ArEtmnJxgLvsT2oK/blWTrE+dJGfcU9nhYbAAgA4yaXtYM0cig5EyEMe4J6VgxEpkVvaIwd7kPE+Fvw25igkcPK8YdowRrjz2YAnB+cfFCTxSohY20pUDfSAT9q5w6UC6S3XUFZiZpc6n75bB3Y5zk/NWuT6Rv5L+FbG5upYJAG16Y9KjA67Z+1dC/IRfSx3GKcXK/qA194ObG5spLY8CtpGtnhxPMukmXPXbr4qJAeH3Eq2seppwOcZoyDFt23ovjfBbzg3E44be9kbMQcOAU6kgjGT4/wCV4hARPUzOfzMxJJNc+MQU1dyMmcY2IApv0PxITGqW+nVqPsMEUuvbQE6myG8eKbhSuo6Rgd80HONQd0z77d6MCpQiki4bK4ZViiYFWHq8nao4Ld0j1FtMZHbqKgKpCADgaQCTk9K0D6J4RG1pHfzoGz6oVx0Hn9qhQW1Bw4PjZOpk1nDbXcIkvLQRzSR51Spg79eu+M/rTXh9wscSgiPKKExGxfp3Jxt8UF9RR3DIZIoWOgHAAzmkPD+O3okW3HBpUz6TO5YKo8hTsK0bGp0QFrsy92ckcgLFFyDgsfFVr63sbJLAXduiQziQA6RguD5A6nvmmNpPELT8OzcwZJaQHY+MVR7+/W6un0zPIgdlQk5BUHrUNoTJyuoxntF8yPJCAS/TOaDvpjdztI6rzSAG0KFUds4FHXLGQBQdvtvS2YsrctlwD1OoVWYkthoeIBZus1vpGoZOwY/vWhcM+ueD2XDobW+nEE0UaoYz7Dtis3DSW8KsSpJIKYOxHfOaDu0F/pukPJniI0sR+v715BRuNMAGFz28GbHY8dh4kryWlzNENWCe/wAYYbfahOJ3CwKzG7mlZhsjPnVWbWMlzeqtrdzrDdYbEhYoG29JDec9u9eY04xaShriD+A6XklmGn+7JJHwM+1Xi2E3qy12+kvL8SlksSJcwLIVjRVbLFmOPgUqxHqRFlyYxoMgICtjuKVT3duyY1fiJAW3kHoUeEBOcHuTufYbV6ilEp5UGqX8xCkYqt/YTDyXGZaT+qE3IPNkjyGTypBH9Kg1vMyRL6nOFAP+K8iYJJiYYPQId964wTqRnV0yNqqYxZ0INGIVgum0iWCcKo3zGf8ARRcNpeSrtbzsjfyz2rQUlXThl+4zU3PxsmMeBRbqOvkl8dpnPLu40cLaSgsCuGjOD7b0Xxm0KvbpYpO0CxAheURpbJznO42q7m4znGBXTK4I2qACIScXqhTtozNnjmY6XikjKddakbeaItZJrdjJGY2PcasY9qv04SeMpNEjq2xDCohFEkfptoguMbKMii3BThhGsGZfc3UvPY5bJJOnz8VNDdSCEElySceoEAe1XHi3D7W5fVyYwcY1Ab1xYreG1aBbeJlIwcrnH3qSLgPxe17n/9k=',
+                        },
+                        {
+                            name: 'Luis Gustavo',
+                            image: 'https://pps.whatsapp.net/v/t61.24694-24/312238733_555902329371913_4474784912173818833_n.jpg?ccb=11-4&oh=01_AdRaCB1ctp-pRUsobxY1mJdQO1QD0PElBRo6c_D1fyLWhA&oe=63BBE6D1',
+                        }
+                    ]
+                }
+            ],
+
+
+
+            headers: [
+            {
+                text: '',
+                align: 'center',
+                value: 'name',
+                groupable: false,
+                sortable: false,
+            },
+            { text: 'Nome', value: 'person', align: 'right' },
+            ],
+            purchases: [
+            {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Whisky - R$145,90'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Energético - R$51,00'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Água sem gás - R$1,96'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Cerveja - R$143,28'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Águas de coco congelada - R$29,00'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Refrigerante - R$13,48'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Azeitona - R$12,68'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Amendoim - R$28,96'
+                },
+                {
+                    person: 'Kevem Lima (valor a pagar - R$84,26)',
+                    name: 'Salame R$31,94'
+                },
+
+
+
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Vodka - R$36,90'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Energético R$51,00'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Água sem gás - R$1,96'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Água com gás - R$4,16'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Cerveja - R$143,28'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Suco - R$19,94'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Águas de coco congelada - R$29,00'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Refrigerante - R$13,48'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Azeitona - R$12,68'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Amendoim - R$28,96'
+                },
+                {
+                    person: 'Hudson Artur (valor a pagar - R$70,11)',
+                    name: 'Salame - R$31,94'
+                },
+
+
+
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Vodka - R$36,90'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Água com gás - R$4,16'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Cerveja - R$143,28'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Suco - R$19,94'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Refrigerante - R$13,48'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Azeitona - R$12,68'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Amendoim - R$28,96'
+                },
+                {
+                    person: 'Izza Dias (valor a pagar - R$56,29)',
+                    name: 'Salame - R$31,94'
+                },
+
+
+
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Whisky - R$145,90'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Vodka - R$36,90'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Energético R$51,00'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Água sem gás - R$1,96'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Água com gás - R$4,16'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Cerveja - R$143,28'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Suco - R$19,94'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Águas de coco congelada - R$29,00'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Refrigerante - R$13,48'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Amendoim - R$28,96'
+                },
+                {
+                    person: 'Caio Ribeiro (valor a pagar - R$96,75)',
+                    name: 'Salame - R$31,94'
+                },
+
+
+
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Whisky - R$145,90'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Vodka - R$36,90'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Energético R$51,00'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Água com gás - R$4,16'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Cerveja - R$143,28'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Suco - R$19,94'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Águas de coco congelada - R$29,00'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Refrigerante - R$13,48'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Azeitona - R$12,68'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Amendoim - R$28,96'
+                },
+                {
+                    person: 'Lucas Vinicius (valor a pagar - R$98,80)',
+                    name: 'Salame - R$31,94'
+                },
+
+
+
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Whisky - R$145,90'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Energético R$51,00'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Água com gás - R$4,16'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Cerveja - R$143,28'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Águas de coco congelada - R$29,00'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Refrigerante - R$13,48'
+                },
+                {
+                    person: 'Yusef Jose (valor a pagar - R$77,23)',
+                    name: 'Salame - R$31,94'
+                },
+
+
+
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Gelo - R$22,40'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Whisky - R$145,90'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Energético R$51,00'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Água sem gás - R$1,96'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Águas de coco congelada - R$29,00'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Azeitona - R$12,68'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Amendoim - R$28,96'
+                },
+                {
+                    person: 'Luis Gustavo (valor a pagar - R$58,21)',
+                    name: 'Salame - R$31,94'
+                },
+            ],
+        }
+      }
+    })
+  </script>
+   <script src="countdown.js"></script>
+
+  <style>
+     /* CSS - Countdown */
+    .year {
+        font-size: 40px;
+    }
+
+    /* CSS - Car Total */
+    .container-total {
+        box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+        width: max-content;
+        border-radius: 3px;
+    }
+
+    .container-total p {
+        font-size: 20px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    /* CSS - Card Product */
+    .content-item {
+        min-height: 350px;
+        box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+        border-radius: 3px;
+    }
+
+    .item-image {
+        width: 80px;
+    }
+
+    .person-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .person-name {
+        font-size: 14px;
+        text-align: center;
+        margin: 0 !important;
+    }
+
+    @media (max-width: 483px) {
+        .content-person {
+            flex-direction: column;
+        }
+    }
+
+
+
+    /* CSS - Table */
+    .v-data-table {
+        box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+    }
+
+    .v-data-table-header {
+      display: none;
+    }
+
+    .v-row-group__header td {
+        font-weight: 900;
+        font-size: 20px !important;
+    }
+
+    th i {
+        display: none;
+    }
+
+    td button:last-child {
+        display: none;
+    }
+
+    .v-data-footer {
+        display: none;
+    }
+  </style>
+</body>
+</html>
